@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Patient Records | AI Health Prediction{% endblock %}
+{% block breadcrumb %}Patient Records{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><div class="eyebrow">OVERVIEW</div><h1>Patient records</h1><p class="page-subtitle">Manage patient details and review AI-generated health remarks.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('create_patient') }}"><span>＋</span> Add patient</a>
+</div>
+
+<div class="stat-grid">
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">Total records</span><span class="stat-symbol purple">▦</span></div><div class="stat-value">{{ total }}</div><div class="stat-foot">Saved in your database</div></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">AI remarks generated</span><span class="stat-symbol green">✦</span></div><div class="stat-value">{{ ai_ready }}</div><div class="stat-foot">Successfully processed by Groq</div></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">Need attention</span><span class="stat-symbol amber">!</span></div><div class="stat-value">{{ needs_attention }}</div><div class="stat-foot">AI remarks pending or unavailable</div></article>
+</div>
+
+<div class="content-card records-card">
+  <div class="card-header"><div><h2>All patients</h2><p>Search, view, update or remove a patient record.</p></div>
+    <form class="search-form" action="{{ url_for('index') }}" method="get"><span class="search-icon">⌕</span><input type="search" name="q" value="{{ search }}" placeholder="Search name or email"><button type="submit">Search</button>{% if search %}<a class="clear-search" href="{{ url_for('index') }}">Clear</a>{% endif %}</form>
+  </div>
+  {% if patients %}
+  <div class="table-wrap">
+    <table class="records-table">
+      <thead><tr><th>PATIENT</th><th>DATE OF BIRTH</th><th>GLUCOSE (mg/dL)</th><th>HAEMOGLOBIN (g/dL)</th><th>CHOLESTEROL (mg/dL)</th><th>AI REMARKS</th><th></th></tr></thead>
+      <tbody>
+      {% for patient in patients %}
+        <tr>
+          <td><a class="patient-name" href="{{ url_for('patient_detail', patient_id=patient.id) }}">{{ patient.full_name }}</a><span class="patient-email">{{ patient.email }}</span></td>
+          <td class="muted-cell">{{ patient.date_of_birth|display_date }}</td>
+          <td class="number-cell">{{ patient.glucose|number }}</td>
+          <td class="number-cell">{{ patient.haemoglobin|number }}</td>
+          <td class="number-cell">{{ patient.cholesterol|number }}</td>
+          <td class="remark-cell"><div class="remark-preview">{{ patient.remarks }}</div>{% if patient.ai_status == 'generated' %}<span class="status-pill status-success"><i></i> Generated</span>{% else %}<span class="status-pill status-pending"><i></i> Pending</span>{% endif %}</td>
+          <td><div class="row-actions"><a class="icon-action" title="View record" href="{{ url_for('patient_detail', patient_id=patient.id) }}">↗</a><a class="icon-action" title="Edit record" href="{{ url_for('edit_patient', patient_id=patient.id) }}">✎</a><form method="post" action="{{ url_for('delete_patient', patient_id=patient.id) }}" data-confirm="Delete {{ patient.full_name }}? This cannot be undone."><button class="icon-action danger-action" title="Delete record" type="submit">⌫</button></form></div></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="empty-state"><div class="empty-icon">▦</div><h3>{% if search %}No matching patients{% else %}No patient records yet{% endif %}</h3><p>{% if search %}Try another name or email address.{% else %}Add your first patient to begin managing blood-test information.{% endif %}</p>{% if not search %}<a class="btn btn-primary" href="{{ url_for('create_patient') }}">＋ Add first patient</a>{% endif %}</div>
+  {% endif %}
+  <div class="table-footer"><span>Showing {{ patients|length }} record{% if patients|length != 1 %}s{% endif %}{% if search %} matching “{{ search }}”{% endif %}</span><span>Duplicate contacts are allowed for this assessment.</span></div>
+</div>
+<div class="disclaimer-strip"><span class="disclaimer-icon">ⓘ</span><p><strong>For educational demonstration only.</strong> AI remarks are not medical diagnoses. The application assumes units for this demonstration; actual units and laboratory reference ranges should be confirmed against the original report.</p></div>
+{% endblock %}

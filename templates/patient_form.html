@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% if mode == 'create' %}{% set page_title = 'Add patient' %}{% else %}{% set page_title = 'Edit patient' %}{% endif %}
+{% block title %}{{ page_title }} | AI Health Prediction{% endblock %}
+{% block breadcrumb %}{{ page_title }}{% endblock %}
+{% block content %}
+<div class="page-heading compact-heading"><div><div class="eyebrow">PATIENT MANAGEMENT</div><h1>{{ page_title }}</h1><p class="page-subtitle">Enter the contact and blood-test information below.</p></div><a class="btn btn-secondary" href="{{ url_for('index') }}">← Back to records</a></div>
+<form class="content-card patient-form" method="post" novalidate>
+  <div class="form-section-heading"><div class="section-number">01</div><div><h2>Personal information</h2><p>Basic details used to identify the patient.</p></div></div>
+  <div class="form-grid">
+    <div class="field full-field"><label for="full_name">Full name <span>*</span></label><input id="full_name" name="full_name" type="text" maxlength="100" placeholder="Enter full name" value="{{ values.get('full_name', '') }}" required autocomplete="name"><small>Use the name as provided in the assessment data.</small></div>
+    <div class="field"><label for="dob">Date of birth <span>*</span></label><input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric" value="{{ values.get('date_of_birth', '') }}" required><small>Use DD/MM/YYYY; separators are added automatically.</small></div>
+    <div class="field"><label for="email">Email address <span>*</span></label><input id="email" name="email" type="email" placeholder="name@example.com" value="{{ values.get('email', '') }}" required autocomplete="email"><small>Enter a complete email address with a valid domain.</small></div>
+  </div>
+  <div class="form-divider"></div>
+  <div class="form-section-heading"><div class="section-number blue-number">02</div><div><h2>Blood test results</h2><p>Enter the numbers exactly as shown on the test report.</p></div></div>
+  <div class="form-grid three-col">
+    <div class="field"><label for="glucose">Glucose (mg/dL) <span>*</span></label><div class="input-suffix"><input id="glucose" name="glucose" type="number" min="0.000001" step="any" placeholder="e.g. 94" value="{{ values.get('glucose', '') }}" required><span>Numeric</span></div></div>
+    <div class="field"><label for="haemoglobin">Haemoglobin (g/dL) <span>*</span></label><div class="input-suffix"><input id="haemoglobin" name="haemoglobin" type="number" min="0.000001" step="any" placeholder="e.g. 13.5" value="{{ values.get('haemoglobin', '') }}" required><span>Numeric</span></div></div>
+    <div class="field"><label for="cholesterol">Cholesterol (mg/dL) <span>*</span></label><div class="input-suffix"><input id="cholesterol" name="cholesterol" type="number" min="0.000001" step="any" placeholder="e.g. 180" value="{{ values.get('cholesterol', '') }}" required><span>Numeric</span></div></div>
+  </div>
+  <div class="form-info"><span>ⓘ</span><p>For this demonstration, the assumed units are Glucose (mg/dL), Haemoglobin (g/dL), and Cholesterol (mg/dL). The original assessment does not specify units. Always verify units and reference ranges against the original lab report.</p></div>
+  <div class="form-actions"><a class="btn btn-secondary" href="{{ url_for('index') }}">Cancel</a><button class="btn btn-primary" type="submit">{% if mode == 'create' %}Save patient & generate AI remarks{% else %}Save changes{% endif %}<span>→</span></button></div>
+</form>
+{% endblock %}
